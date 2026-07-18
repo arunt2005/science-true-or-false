@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose the Best Answer</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
+
+</head>
+
+<body>
+
+<div class="quiz-box" id="quiz">
+
+    <div class="app-title">Choose the Best Answer</div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+
+    <div class="question" id="question"></div>
+    <div id="options"></div>
+
+    <button class="btn-submit" onclick="submitQuiz()">Submit</button>
+    <button class="btn-restart" onclick="confirmRestart()">Restart</button>
+</div>
+
+<!-- Score Popup -->
+<div class="popup" id="scorePopup">
+    <div class="popup-content">
+        <h3>Your Score</h3>
+        <h1 id="score"></h1>
+        <p onclick="closeScorePopup()" style="cursor:pointer;">Tap to close</p>
+        <a href="javascript:void(0)" onclick="viewResult()">View Result</a>
+    </div>
+</div>
+
+<!-- Restart Confirmation Popup -->
+<div class="popup" id="restartPopup">
+    <div class="popup-content">
+        <h3>Restart Test</h3>
+        <p>Do you want to Restart the Test?</p>
+        <button class="btn-submit" onclick="restartQuiz()">Yes</button>
+        <button class="btn-restart" onclick="closeRestartPopup()">No</button>
+    </div>
+</div>
+
+<div class="result-box" id="resultBox" onclick="closeResult()"></div>
+
+
+
+<script>
+
+/* 
+let originalQuestions = [
+    { q: "Capital of India?", options: ["Delhi","Mumbai","Chennai","Kolkata"], answer: "Delhi" },
+    { q: "5 × 6 = ?", options: ["30","11","25","36"], answer: "30" },
+    { q: "Gas for breathing?", options: ["Oxygen","Hydrogen","Nitrogen","CO2"], answer: "Oxygen" },
+	{ q: "Capital of India?", options: ["Delhi","Mumbai","Chennai","Kolkata"], answer: "Delhi" }
+];
+*/
+
+let questions = [];
+let current = 0;
+let answers = {};
+let startX = 0;
+
+/* ===== HELPERS ===== */
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function initQuiz() {
+    questions = JSON.parse(JSON.stringify(originalQuestions));
+    shuffle(questions);
+    questions.forEach(q => shuffle(q.options));
+    current = 0;
+    answers = {};
+    document.getElementById("quiz").style.display = "block";
+    document.getElementById("resultBox").style.display = "none";
+    renderPagination();
+    loadQuestion();
+}
+
+/* ===== PAGINATION ===== */
+function renderPagination() {
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+    questions.forEach((_, i) => {
+        const btn = document.createElement("button");
+        btn.className = "page-btn";
+        btn.textContent = i + 1;
+        btn.onclick = () => {
+            current = i;
+            loadQuestion();
+        };
+        pag.appendChild(btn);
+    });
+}
+
+function updatePagination() {
+    document.querySelectorAll(".page-btn").forEach((btn, i) => {
+        btn.classList.remove("current","answered");
+        if (i === current) btn.classList.add("current");
+        if (answers[i]) btn.classList.add("answered");
+    });
+}
+
+/* ===== QUESTION LOAD ===== */
+function loadQuestion() {
+    const q = questions[current];
+    document.getElementById("question").textContent =
+        `${current + 1}) ${q.q}`;
+
+    const optBox = document.getElementById("options");
+    optBox.innerHTML = "";
+
+    q.options.forEach(opt => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.textContent = opt;
+        div.onclick = () => selectOption(opt, div);
+        if (answers[current] === opt) div.classList.add("selected");
+        optBox.appendChild(div);
+    });
+
+    updateProgress();
+    updatePagination();
+}
+
+/* ===== OPTION SELECT ===== */
+function selectOption(opt, el) {
+    answers[current] = opt;
+    document.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));
+    el.classList.add("selected");
+
+    updateProgress();
+    updatePagination();
+
+    setTimeout(()=>{
+        if(current < questions.length-1){
+            current++;
+            loadQuestion();
+        }
+    },300);
+}
+
+/* ===== PROGRESS ===== */
+function updateProgress() {
+    const answeredCount = Object.keys(answers).length;
+    document.getElementById("progressBar").style.width =
+        (answeredCount / questions.length) * 100 + "%";
+}
+
+/* ===== SWIPE ===== */
+const quizBox = document.getElementById("quiz");
+quizBox.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+quizBox.addEventListener("touchend", e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (diff > 60 && current < questions.length - 1) { current++; loadQuestion(); }
+    if (diff < -60 && current > 0) { current--; loadQuestion(); }
+});
+
+/* ===== SUBMIT / RESULT ===== */
+function submitQuiz() {
+    let score = 0;
+    questions.forEach((q,i)=>{
+        if(answers[i] === q.answer) score++;
+    });
+    document.getElementById("score").textContent = score + "/" + questions.length;
+    document.getElementById("scorePopup").style.display = "flex";
+}
+
+function closeScorePopup() {
+    document.getElementById("scorePopup").style.display = "none";
+}
+
+function viewResult() {
+    closeScorePopup();
+    document.getElementById("quiz").style.display = "none";
+
+    const box = document.getElementById("resultBox");
+    box.innerHTML = "<h2>Result Review</h2>";
+
+    questions.forEach((q,i)=>{
+        const correct = answers[i] === q.answer;
+        box.innerHTML += `
+            <p><b>${i+1}) ${q.q}</b></p>
+            <p>Your Answer:
+                <span class="${correct ? 'correct':'wrong'}">
+                    ${answers[i] || 'Not Answered'} ${correct ? '✔':'✖'}
+                </span>
+            </p>
+            <p>Correct Answer:
+                <span class="correct">${q.answer}</span>
+            </p>
+            <hr/>
+        `;
+    });
+
+    box.innerHTML += `<p class="tap-note">Tap anywhere to close result</p>`;
+    box.style.display = "block";
+}
+
+function closeResult() {
+    initQuiz();
+}
+
+/* ===== RESTART CONFIRMATION ===== */
+function confirmRestart() {
+    document.getElementById("restartPopup").style.display = "flex";
+}
+
+function closeRestartPopup() {
+    document.getElementById("restartPopup").style.display = "none";
+}
+
+function restartQuiz() {
+    closeRestartPopup();
+    initQuiz();
+}
+
+initQuiz();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.quiz-box, .result-box {
+    background: #fff;
+    width: 95%;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* ===== TITLE ===== */
+.app-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    color: #673ab7;
+    margin-bottom: 10px;
+}
+
+/* ===== PROGRESS ===== */
+.progress-container {
+    background: #eee;
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #4caf50;
+    transition: width 0.4s;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.page-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background: #bdbdbd;
+}
+
+.page-btn.current { background: #2196f3; }
+.page-btn.answered { background: #4caf50; }
+
+/* ===== QUESTION ===== */
+.question {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* ===== OPTIONS ===== */
+.option {
+    background: #f3f3f3;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.option.selected {
+    background: #2196f3;
+    color: white;
+}
+
+/* ===== BUTTONS ===== */
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: #1976d2;   /* Blue */
+    color: white;
+    border-radius: 25px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background: #0d47a1;
+}
+
+.btn-restart {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: #ff9800;   /* Orange */
+    color: white;
+    border-radius: 25px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn-restart:hover {
+    background: #ef6c00;
+}
+
+/* ===== POPUPS ===== */
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    width: 280px;
+    text-align: center;
+}
+
+/* ===== RESULT ===== */
+.result-box {
+    display: none;
+    cursor: pointer;
+}
+
+.correct { color: green; font-weight: bold; }
+.wrong { color: red; font-weight: bold; }
+
+.tap-note {
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+}
